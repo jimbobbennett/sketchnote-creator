@@ -1,0 +1,122 @@
+/* Sketchnote styling — Arize palette applied to a hand-drawn hand.
+   Fonts: Permanent Marker (title punch) · Shantell Sans (legible hand, headers+body) · Geist Mono (footer labels). */
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Shantell+Sans:ital,wght@0,300..800;1,300..800&family=Geist+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Arize tokens */
+  --pink: #EA338A;       /* the one accent — flow + emphasis only */
+  --magenta: #C2266F;
+  --teal: #008394;
+  --indigo: #7582FF;
+  --purple: #8B4FD4;
+
+  --canvas: #F9F9FA;     /* light canvas (default) */
+  --ink: #5F5F73;        /* linework + body on light */
+  --ink-2: #8F8F9C;      /* secondary */
+  --paper-grain: #00000005;
+
+  --font-title: 'Permanent Marker', cursive;
+  --font-hand: 'Shantell Sans', cursive;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+}
+
+#canvas[data-theme="dark"] {
+  --canvas: #121221;
+  --ink: #F7F7FC;
+  --ink-2: #ABABBA;
+  --paper-grain: #ffffff08;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+#canvas {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--canvas);
+  background-image: radial-gradient(var(--paper-grain) 1px, transparent 1px);
+  background-size: 6px 6px;
+  color: var(--ink);
+  font-family: var(--font-hand);
+  padding: 32px 44px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+}
+
+/* marginalia layer sits behind the content; doodles are only placed in free zones */
+.decor-layer { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
+.topbar, .grid, .footer { position: relative; z-index: 1; }
+
+/* ---------- title block (top-left, Nitya-style anchor) ---------- */
+.topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+.title-block { position: relative; max-width: 78%; }
+.title {
+  font-family: var(--font-title);
+  font-size: 62px;
+  line-height: 0.98;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+}
+.title .title-underline { position: absolute; left: 0; bottom: -10px; width: 100%; height: 16px; pointer-events: none; }
+.subtitle { font-family: var(--font-hand); font-weight: 500; font-style: italic; font-size: 23px; color: var(--ink-2); margin-top: 20px; }
+.title-block { max-width: 64%; }
+
+/* speaker sketch portraits (top-right) */
+.speakers { display: flex; gap: 16px; align-items: flex-start; flex: none; }
+.speaker { display: flex; flex-direction: column; align-items: center; width: 104px; text-align: center; gap: 5px; }
+.portrait-wrap { width: 88px; height: 88px; border-radius: 50%; background: var(--pink); overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px var(--canvas), 0 0 0 3.5px var(--pink); }
+.portrait { width: 100%; height: 100%; object-fit: cover; }
+.sp-name { font-family: var(--font-hand); font-weight: 700; font-size: 14px; line-height: 1.05; color: var(--ink); }
+.sp-role { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2px; color: var(--ink-2); }
+.brand-mark { width: 54px; height: 54px; flex: none; color: var(--pink); }
+.brand-mark svg { width: 100%; height: 100%; }
+
+/* ---------- grid ---------- */
+.grid { flex: 1; display: grid; gap: 10px; align-items: stretch; min-height: 0; }
+.cell {
+  position: relative;
+  padding: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.cell-bg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+.cell-inner { position: relative; z-index: 1; padding: 12px 18px 16px; display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.cell[data-container="cloud"] .cell-inner { padding: 24px 30px 22px; }
+
+/* banner header */
+.banner { position: relative; align-self: flex-start; padding: 9px 18px 11px 14px; min-height: 40px; display: flex; align-items: center; gap: 10px; }
+.banner-bg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+.banner .num {
+  position: relative; z-index: 1;
+  font-family: var(--font-title); font-size: 19px; line-height: 1;
+  color: var(--canvas); background: rgba(0,0,0,0.18); border-radius: 50%;
+  width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+}
+.banner .banner-text {
+  position: relative; z-index: 1;
+  font-family: var(--font-hand); font-weight: 700; font-size: 21px; line-height: 1.15;
+  color: var(--canvas);  /* knockout */
+  text-shadow: 0 1px 0 rgba(0,0,0,0.12);
+}
+
+/* body */
+.cell-body { display: flex; gap: 12px; align-items: flex-start; flex: 1; }
+.icon { width: 68px; height: 68px; flex: none; margin-top: 2px; }
+.icon svg { width: 100%; height: 100%; }
+.figure { width: 96px; max-height: 104px; flex: none; object-fit: contain; margin-top: 2px; }
+.bullets { list-style: none; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+.bullets li { position: relative; padding-left: 26px; font-size: 16px; line-height: 1.18; font-weight: 400; }
+.bullets li .check { position: absolute; left: 0; top: -1px; width: 20px; height: 20px; }
+
+/* quote */
+.quote { position: relative; align-self: stretch; margin: 3px 6px 5px; padding: 7px 13px 16px; }
+.quote-bg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.quote-text { position: relative; z-index: 1; font-family: var(--font-hand); font-style: italic; font-weight: 600; font-size: 15px; color: var(--pink); }
+
+/* ---------- footer ---------- */
+.footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 8px; padding-top: 10px; }
+.footer .f-logo { display: block; }
+.footer .f-logo svg { height: 30px; width: auto; display: block; }

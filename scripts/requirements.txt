@@ -1,0 +1,9 @@
+# Python deps for the YouTube → Sketchnote skill
+youtube-transcript-api>=1.0      # transcript extraction (1.x instance API)
+google-genai>=1.0                # Gemini: video-notes, speaker/slide sketches, video validation
+Pillow>=10                       # crop + background-keying for portraits/slide sketches
+# Optional, only for the no-captions ASR fallback (or use whisper.cpp `whisper-cli`):
+# openai-whisper
+# faster-whisper
+# Optional, only for --with-frames OCR (Gemini video-notes usually replaces this):
+# pytesseract

@@ -1,0 +1,86 @@
+{
+  "title": "What is AI observability?",
+  "subtitle": "turning agent chaos into a feedback loop",
+  "source": { "url": "https://youtube.com/watch?v=DEMO", "channel": "Arize AI", "duration": "PT18M" },
+  "layout": "grid",
+  "canvas": { "theme": "light", "aspect": "16:9", "cols": 3 },
+  "sections": [
+    {
+      "n": 1,
+      "header": "Why agents break",
+      "hue": "teal",
+      "icon": "bot",
+      "bullets": [
+        "Sub-agents + tool calls = hidden failures",
+        "Errors are hard to trace and reproduce",
+        "You can't fix what you can't see"
+      ],
+      "quote": "Don't ship vibes."
+    },
+    {
+      "n": 2,
+      "header": "What is a span?",
+      "hue": "indigo",
+      "icon": "git-branch",
+      "bullets": [
+        "One unit of work in a trace",
+        "Captures inputs, outputs, timing",
+        "Spans nest into a full trace"
+      ],
+      "quote": null
+    },
+    {
+      "n": 3,
+      "header": "Trace everything",
+      "hue": "purple",
+      "icon": "workflow",
+      "bullets": [
+        "OpenTelemetry + OpenInference",
+        "Every LLM, retriever, tool call",
+        "Built on open standards"
+      ],
+      "quote": null
+    },
+    {
+      "n": 4,
+      "header": "Evaluate, don't guess",
+      "hue": "magenta",
+      "icon": "shield-check",
+      "bullets": [
+        "LLM-as-a-judge on real traffic",
+        "No black-box eval models",
+        "Catch regressions before users do"
+      ],
+      "quote": "No black box eval models."
+    },
+    {
+      "n": 5,
+      "header": "Close the loop",
+      "hue": "teal",
+      "icon": "refresh-cw",
+      "bullets": [
+        "Observe → evaluate → develop",
+        "Feed production signal back to dev",
+        "Improve agents continuously"
+      ],
+      "quote": null
+    },
+    {
+      "n": 6,
+      "header": "Where Alyx fits",
+      "hue": "indigo",
+      "icon": "sparkles",
+      "bullets": [
+        "The AI engineering agent in AX",
+        "Runs evals, debugs, suggests fixes",
+        "Like Cursor, but for AI engineering"
+      ],
+      "quote": null
+    }
+  ],
+  "footer": {
+    "left": "youtube.com/watch?v=DEMO",
+    "center": "sketchnoted by Claude",
+    "right": "Arize AI"
+  }
+}

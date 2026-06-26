@@ -1,0 +1,17 @@
+node_modules/
+scripts/node_modules/
+*.log
+.DS_Store
+
+# Per-video working dirs / generated media (kept out of the repo)
+work/
+out/
+research/nitya-samples/
+
+# Generated per-video assets (outputs, not source). Brand assets in assets/brand/ ARE committed.
+assets/speakers/
+assets/slides/
+assets/*-speakers/
+assets/*-slides/
+
+# Committed sample outputs live in examples/ (not ignored)

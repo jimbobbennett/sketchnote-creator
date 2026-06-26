@@ -1,0 +1,19 @@
+{
+  "name": "sketchnote-render",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Render a sketchnote layout.json to PNG + SVG (rough.js + Playwright)",
+  "bin": {
+    "render-sketchnote": "render.mjs"
+  },
+  "scripts": {
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.8",
+    "lucide-static": "^1.21.0",
+    "playwright": "^1.49.0",
+    "roughjs": "^4.6.6"
+  }
+}
