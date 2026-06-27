@@ -24,22 +24,43 @@ const emitSvg = !flag('--no-svg');
 const scale = Number(opt('--scale', '2'));
 const keepHtml = flag('--keep-html');
 
-// ---------- palette ----------
-const HUES = { teal: '#008394', indigo: '#7582FF', purple: '#8B4FD4', magenta: '#C2266F', pink: '#EA338A' };
-const HUE_CYCLE = ['teal', 'indigo', 'purple', 'magenta'];
-const ACCENT = '#EA338A';
-
 // ---------- load ----------
 const layout = JSON.parse(readFileSync(inputPath, 'utf8'));
 const css = readFileSync(join(ROOT, 'templates', 'sketchnote.css'), 'utf8');
 const drawJs = readFileSync(join(ROOT, 'templates', 'draw.js'), 'utf8');
 const doodlesJs = readFileSync(join(ROOT, 'templates', 'doodles.js'), 'utf8');
 const roughSrc = readFileSync(join(ROOT, 'scripts', 'node_modules', 'roughjs', 'bundled', 'rough.js'), 'utf8');
-const theme = flag('--dark') ? 'dark' : flag('--light') ? 'light' : (layout.canvas?.theme || 'dark');
-const inkColor = theme === 'dark' ? '#F7F7FC' : '#5F5F73';
-const logoFile = theme === 'dark' ? 'arize-logo-pink-white.svg' : 'arize-logo-pink-black.svg';
-const arizeLogo = readFileSync(join(ROOT, 'assets', 'brand', logoFile), 'utf8')
-  .replace(/<\?xml[^>]*\?>/, '').trim();
+
+// ---------- design system (pluggable; default is brand-agnostic) ----------
+const designDir = resolve(opt('--design', layout.design || join(ROOT, 'design', 'default')));
+let design;
+try { design = JSON.parse(readFileSync(join(designDir, 'design.json'), 'utf8')); }
+catch { console.error(`could not read design system at ${designDir}/design.json`); process.exit(1); }
+const HUES = { ...design.hues, pink: design.accent };   // `pink` alias kept for legacy refs
+const HUE_CYCLE = Object.keys(design.hues);
+const ACCENT = design.accent;
+const theme = flag('--dark') ? 'dark' : flag('--light') ? 'light' : (layout.canvas?.theme || design.defaultTheme || 'dark');
+const tone = design[theme] || design.dark;
+const inkColor = tone.ink;
+// footer logo (optional, per theme) — currentColor logos adapt to --ink via CSS
+let logoSvg = '';
+const logoName = design.logo && design.logo[theme];
+if (logoName) {
+  try { logoSvg = readFileSync(join(designDir, logoName), 'utf8').replace(/<\?xml[^>]*\?>/, '').trim(); }
+  catch { warn(`logo ${logoName} not found in ${designDir}`); }
+}
+
+// design tokens injected as CSS (keeps templates/sketchnote.css brand-agnostic)
+const designCss = `@import url('https://fonts.googleapis.com/css2?family=${design.fonts.googleImport}&display=swap');
+:root{
+  --accent:${design.accent}; --pink:${design.accent};
+  ${Object.entries(design.hues).map(([k, v]) => `--${k}:${v};`).join(' ')}
+  --canvas:${design.light.canvas}; --ink:${design.light.ink}; --ink-2:${design.light.ink2}; --paper-grain:${design.light.grain};
+  --font-title:'${design.fonts.title}', cursive;
+  --font-hand:'${design.fonts.hand}', cursive;
+  --font-mono:'${design.fonts.mono}', ui-monospace, monospace;
+}
+#canvas[data-theme="dark"]{ --canvas:${design.dark.canvas}; --ink:${design.dark.ink}; --ink-2:${design.dark.ink2}; --paper-grain:${design.dark.grain}; }`;
 
 // ---------- light validation (budgets) ----------
 function warn(m) { console.warn('  ⚠ ' + m); }
@@ -124,7 +145,10 @@ const topbarHtml = `<div class="topbar">
     </div>
     ${speakersHtml}
   </div>`;
-const footerHtml = `<div class="footer"><span class="f-logo">${arizeLogo}</span></div>`;
+const footerBits = [];
+if (logoSvg) footerBits.push(`<span class="f-logo">${logoSvg}</span>`);
+if (design.footerText) footerBits.push(`<span class="f-name">${esc(design.footerText)}</span>`);
+const footerHtml = `<div class="footer">${footerBits.join('')}</div>`;
 
 // ---- grid body (fixed 16:9 canvas: 1920×1080 CSS px → 3840×2160 at 2× scale) ----
 const N = layout.sections.length;
@@ -142,7 +166,7 @@ const canvasHtml = `<div id="canvas" data-theme="${theme}" data-layout="grid">
 </div>`;
 
 const html = `<!doctype html><html><head><meta charset="utf-8">
-<style>${css}</style></head><body style="margin:0;background:#fff">
+<style>${designCss}</style><style>${css}</style></head><body style="margin:0;background:#fff">
 ${canvasHtml}
 <script>window.__HUES=${JSON.stringify(HUES)};window.__ACCENT=${JSON.stringify(ACCENT)};window.__INK=${JSON.stringify(inkColor)};
 window.__SEED=${Number(opt('--seed', (layout.decor?.seed ?? 7)))};window.__DECOR=${JSON.stringify(opt('--decor', layout.decor?.density || 'light'))};
@@ -172,7 +196,7 @@ if (emitSvg) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml"
   width="${dims.w}" height="${dims.h}" viewBox="0 0 ${dims.w} ${dims.h}">
   <foreignObject width="${dims.w}" height="${dims.h}">
-    <div xmlns="http://www.w3.org/1999/xhtml"><style>${css}</style>${inner}</div>
+    <div xmlns="http://www.w3.org/1999/xhtml"><style>${designCss}</style><style>${css}</style>${inner}</div>
   </foreignObject>
 </svg>`;
   writeFileSync(outBase + '.svg', svg);

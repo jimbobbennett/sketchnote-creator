@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 30" fill="none" aria-label="sketchnote">
+  <!-- a little hand-drawn pencil mark; uses currentColor so it adapts to the theme -->
+  <path d="M5 25 L7 19 L21 5 C22 4 23.5 4 24.5 5 L27 7.5 C28 8.5 28 10 27 11 L13 25 L5 25 Z"
+        stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+  <path d="M19 7 L25 13" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M5 25 L9.5 23.5" stroke="currentColor" stroke-width="1.6"/>
+  <path d="M3 29 C9 27, 16 27, 22 29" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+</svg>

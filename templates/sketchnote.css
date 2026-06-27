@@ -1,31 +1,6 @@
-/* Sketchnote styling — Arize palette applied to a hand-drawn hand.
-   Fonts: Permanent Marker (title punch) · Shantell Sans (legible hand, headers+body) · Geist Mono (footer labels). */
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Shantell+Sans:ital,wght@0,300..800;1,300..800&family=Geist+Mono:wght@400;500&display=swap');
-
-:root {
-  /* Arize tokens */
-  --pink: #EA338A;       /* the one accent — flow + emphasis only */
-  --magenta: #C2266F;
-  --teal: #008394;
-  --indigo: #7582FF;
-  --purple: #8B4FD4;
-
-  --canvas: #F9F9FA;     /* light canvas (default) */
-  --ink: #5F5F73;        /* linework + body on light */
-  --ink-2: #8F8F9C;      /* secondary */
-  --paper-grain: #00000005;
-
-  --font-title: 'Permanent Marker', cursive;
-  --font-hand: 'Shantell Sans', cursive;
-  --font-mono: 'Geist Mono', ui-monospace, monospace;
-}
-
-#canvas[data-theme="dark"] {
-  --canvas: #121221;
-  --ink: #F7F7FC;
-  --ink-2: #ABABBA;
-  --paper-grain: #ffffff08;
-}
+/* Sketchnote structure + components. The design-system TOKENS (colours, fonts, --pink/--teal/
+   --indigo/--purple/--magenta, --canvas, --ink, --font-*) are injected by render.mjs from the
+   chosen design system (design/<name>/design.json), so this file stays brand-agnostic. */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -117,6 +92,7 @@
 .quote-text { position: relative; z-index: 1; font-family: var(--font-hand); font-style: italic; font-weight: 600; font-size: 15px; color: var(--pink); }
 
 /* ---------- footer ---------- */
-.footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 8px; padding-top: 10px; }
-.footer .f-logo { display: block; }
+.footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 8px; padding-top: 10px; }
+.footer .f-logo { display: block; color: var(--ink); }
 .footer .f-logo svg { height: 30px; width: auto; display: block; }
+.footer .f-name { font-family: var(--font-mono); font-size: 15px; color: var(--ink-2); letter-spacing: 0.3px; }

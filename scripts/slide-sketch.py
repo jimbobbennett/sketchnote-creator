@@ -21,8 +21,6 @@ Requires GEMINI_API_KEY, google-genai, Pillow, yt-dlp, ffmpeg. Public videos onl
 import argparse, glob, io, json, os, re, subprocess, sys
 from pathlib import Path
 
-HUES = {"teal": "#008394", "indigo": "#7582FF", "purple": "#8B4FD4", "magenta": "#C2266F", "pink": "#EA338A"}
-CYCLE = ["teal", "indigo", "purple", "magenta"]
 V_MODEL = os.environ.get("GEMINI_VISION_MODEL", "gemini-2.5-pro")
 I_MODEL = os.environ.get("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image")
 
@@ -89,6 +87,7 @@ def main():
     ap.add_argument("--context", required=True)
     ap.add_argument("--layout", required=True)
     ap.add_argument("--out-dir", default=None)
+    ap.add_argument("--design", default="design/default", help="design system dir (for section hues)")
     ap.add_argument("--video", default=None)
     ap.add_argument("--cookies-from-browser", default=None)
     ap.add_argument("--model-vision", default=V_MODEL)
@@ -114,6 +113,11 @@ def main():
     for s in sections:                 # clean slate — clear any figures from a previous run
         s.pop("figure", None)
     root = Path.cwd()
+    try:
+        design = json.loads((Path(a.design) / "design.json").read_text())
+        HUES, CYCLE = design["hues"], list(design["hues"])
+    except Exception:
+        sys.exit(f"could not read design system at {a.design}/design.json (--design)")
     out_dir = Path(a.out_dir) if a.out_dir else root / "assets" / "slides"
     out_dir.mkdir(parents=True, exist_ok=True)
     workdir = Path(a.context).parent
@@ -181,7 +185,7 @@ Return ONLY JSON: {{"sections":[{{"n":<int>,"has_slide":<bool>,"simple":<bool>,"
         if not info:
             continue
         ts = float(info.get("timestamp_seconds", 0))
-        hue = HUES.get(s.get("hue") or CYCLE[i % 4], HUES["teal"])
+        hue = HUES.get(s.get("hue") or CYCLE[i % len(CYCLE)], next(iter(HUES.values())))
         frame = workdir / f"slide_{n}.png"
         run(["ffmpeg", "-y", "-loglevel", "error", "-ss", str(ts), "-i", video, "-frames:v", "1", str(frame)])
         if not frame.exists():

@@ -1,0 +1,22 @@
+{
+  "name": "Default",
+  "footerText": "sketchnote",
+  "defaultTheme": "dark",
+  "accent": "#F2545B",
+  "hues": {
+    "teal": "#2A9D8F",
+    "indigo": "#4C6EF5",
+    "purple": "#7C5CDA",
+    "magenta": "#D6336C"
+  },
+  "dark":  { "canvas": "#16181D", "ink": "#F2F3F5", "ink2": "#A0A3AD", "grain": "#ffffff08" },
+  "light": { "canvas": "#FBFBF9", "ink": "#2E3138", "ink2": "#878A93", "grain": "#00000006" },
+  "fonts": {
+    "title": "Permanent Marker",
+    "hand": "Shantell Sans",
+    "mono": "Geist Mono",
+    "googleImport": "Permanent+Marker&family=Shantell+Sans:ital,wght@0,300..800;1,300..800&family=Geist+Mono:wght@400;500"
+  },
+  "logo": { "dark": "logo.svg", "light": "logo.svg" },
+  "voice": "Clear and friendly. Sentence case for headings; short declarative bullets that capture takeaways, not transcript. No emoji. Expose acronyms. Refer to products and people by their correct names."
+}

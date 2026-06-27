@@ -30,9 +30,16 @@ Claude does the **authoring + adjudication**; the scripts do extraction, image g
   npx playwright install chromium      # if Chromium isn't already cached
   ```
 
+## Design system
+
+The look (palette, fonts, logo, voice) is a **pluggable design system** — see `design/README.md`.
+`design/default/` (brand-agnostic) is used unless you pass `--design design/<name>`. Custom brands live
+in `design/<name>/` and stay local/gitignored (Arize's is `design/arize/`). Pass the **same** `--design`
+to `render.mjs` and `slide-sketch.py` so colours match. Follow the chosen design's `voice` when authoring.
+
 ## Steps
 
-Pick a short `<slug>` for the video (e.g. `openai-feedback`). Work in `work/<slug>/`, write assets to `assets/<slug>-*`, output to `out/<slug>.{png,svg}`.
+Pick a short `<slug>` for the video (e.g. `openai-feedback`). Work in `work/<slug>/`, write assets to `assets/<slug>-*`, output to `out/<slug>.{png,svg}`. Add `--design design/<name>` to the slide + render steps to use a specific brand (omit for the default).
 
 ### 1. Extract transcript + metadata
 ```bash
@@ -64,15 +71,15 @@ Gemini finds the speakers in the thumbnail and draws each as a pink-circle line 
 
 ### 5. Slide sketches (selective)
 ```bash
-python3 scripts/slide-sketch.py --context work/<slug>/context.json --layout work/<slug>/layout.json --out-dir assets/<slug>-slides
+python3 scripts/slide-sketch.py --context work/<slug>/context.json --layout work/<slug>/layout.json --out-dir assets/<slug>-slides [--design design/<name>]
 ```
-Gemini picks only sections with a **simple, useful** on-screen visual (it skips dense flowcharts), redraws each as a small line sketch recoloured to the section hue, and patches `section.figure` into the layout. Sections without a figure keep their lucide icon.
+Gemini picks only sections with a **simple, useful** on-screen visual (it skips dense flowcharts), redraws each as a small line sketch recoloured to the section hue (from the design system), and patches `section.figure` into the layout. Sections without a figure keep their lucide icon.
 
 ### 6. Render (4K)
 ```bash
-node scripts/render.mjs work/<slug>/layout.json --out out/<slug>
+node scripts/render.mjs work/<slug>/layout.json --out out/<slug> [--design design/<name>]
 ```
-Borderless-feel grid with subtle hand-drawn borders, 3840×2160. Flags: `--light` (light theme), `--decor none|light|medium|heavy`, `--seed N`, `--no-svg`, `--scale N`. View the PNG and sanity-check legibility/overflow.
+Borderless-feel grid with subtle hand-drawn borders, 3840×2160. Flags: `--design <dir>` (palette/fonts/logo; default `design/default`), `--light` (light theme), `--decor none|light|medium|heavy`, `--seed N`, `--no-svg`, `--scale N`. View the PNG and sanity-check legibility/overflow.
 
 ### 7. Validate, then fix → re-render
 ```bash
@@ -86,7 +93,9 @@ Both emit schema-validated `findings.json` (`verdict` + issues). On `revise`, ap
 - **Product/feature/company names:** trust the **on-screen spelling** from `video_notes` over the auto-caption transcript (captions mangle names — e.g. "Pixie" is really **PXI**, "Alex" is **Alyx**). When unsure, web-search to confirm casing. See the `arize-product-names` memory for Arize's own names (AX, Phoenix, PXI, Alyx, OpenInference, ADB, Signal).
 - **"Observe '26" vs "2026":** the on-screen logo reads `observe '26` (stylised), but it's a 2026 event — the canonical YouTube title says "Arize Observe 2026". **Keep the canonical title; override the validator's branding flag.** Don't write "Observe '26".
 - **Privacy / safety caveats:** if a speaker stresses a caveat (opt-in, PII stripped, no-black-box, etc.), keep it — it's easy to drop when condensing and the validators reliably flag it.
-- **Arize voice:** sentence case everywhere, no emoji, short declaratives, expose acronyms. Refer to products by name. (`assets/brand/arize-brand-notes.md`.)
+- **Voice:** follow the chosen design system's `voice` field (default: clear, sentence-case, no emoji,
+  takeaways not transcript, acronyms exposed). For the Arize design see `design/arize/arize-brand-notes.md`
+  and the `arize-product-names` memory.
 
 ## Output
 `out/<slug>.png` (4K 16:9) + `out/<slug>.svg`. Self-contained — portraits and slide sketches are embedded. Show the user the PNG and a one-line note on what the validators found/fixed.

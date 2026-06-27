@@ -8,10 +8,13 @@ work/
 out/
 research/nitya-samples/
 
-# Generated per-video assets (outputs, not source). Brand assets in assets/brand/ ARE committed.
-assets/speakers/
-assets/slides/
-assets/*-speakers/
-assets/*-slides/
+# Generated per-video assets (outputs, not source).
+assets/
+
+# Design systems: only the generic default + README are committed. Drop your own brand in
+# design/<name>/ and it stays local (e.g. design/arize/).
+design/*
+!design/default/
+!design/README.md
 
 # Committed sample outputs live in examples/ (not ignored)

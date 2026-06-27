@@ -27,30 +27,27 @@ Needs `GEMINI_API_KEY` (video reading, portraits, slide sketches, validation) an
 ## Layout
 
 ```
+SKILL.md                          # the skill — orchestrates the whole pipeline
+scripts/                          # extract / video-notes / speaker-sketch / slide-sketch / render / validate
+templates/                        # sketchnote.css + draw.js + doodles.js (brand-agnostic)
+design/
+  default/                        # generic, committed design system (palette, fonts, pencil logo)
+  README.md                       # how design systems work + how to add your own
+  <yourbrand>/                    # local, gitignored — drop your palette/logo/voice here
 research/
   sketchnotes-best-practices.md   # how sketchnotes work + rules for programmatic generation
   youtube-extraction.md           # how to pull transcript / metadata / visuals from a video
-assets/brand/
-  colors_and_type.css             # Arize design tokens (colors, type, spacing) — verbatim
-  arize-brand-notes.md            # distilled palette + type + voice guide for sketchnotes
-  arize-logo-light.svg            # mark + wordmark, near-white (for dark bg)
-  arize-mark.svg                  # pink "a" triangle mark only (currentColor)
+examples/                         # finished sample sketchnotes
 ```
+
+## Design system (pluggable)
+The look is **not** hard-wired to any brand — palette, fonts, logo, and voice come from a design
+system under `design/<name>/design.json`. `design/default/` ships in the repo; drop your own brand in
+`design/<name>/` (stays local) and pass `--design design/<name>`. See **`design/README.md`**.
 
 ## Research summary
 
-### 1. Arize design system
-Pulled from the `claude.ai/design` project **"Arize Design system May 2026"**
-(`019ddf2b-02aa-70c6-9325-e50a8e8ba3a3`). Key takeaways for a sketchnote, full detail in
-`assets/brand/arize-brand-notes.md`:
-- **Palette:** dark navy `#121221` / light `#F9F9FA` canvas; ink `#5F5F73` or near-white
-  `#F7F7FC` for linework; **pink `#EA338A` as the single signature accent** (used sparingly);
-  teal `#008394`, indigo `#7582FF`, purple `#8B4FD4` for functional grouping only.
-- **Type:** Rubik (Light 300 large = the signature look), Stakkat for punch titles, Geist Mono for labels.
-- **Voice:** engineer-to-engineer, sentence case, no emoji, short declaratives, anti-slogans
-  ("Don't ship vibes"). Reads cleanly onto hand-lettered headers.
-
-### 2. Sketchnote best practices → `research/sketchnotes-best-practices.md`
+### 1. Sketchnote best practices → `research/sketchnotes-best-practices.md`
 Synthesized from Mike Rohde, Doug Neill (Verbal to Visual), Eva-Lotta Lamm, Sunni Brown, et al.
 Most relevant for programmatic generation:
 - **Layout decision rule:** map detected talk structure → layout (linear is the safe default;
@@ -66,7 +63,7 @@ Most relevant for programmatic generation:
 - Two brief corrections from the agent: Rohde's primitives are the **five basic shapes** (square,
   circle, triangle, line, dot), not a "Five S's"; and his seventh layout is **skyscraper**, not "skeleton."
 
-### 3. YouTube extraction → `research/youtube-extraction.md`
+### 2. YouTube extraction → `research/youtube-extraction.md`
 Tooling and an end-to-end pipeline. Headlines:
 - **Cascade** captions → subtitles → Whisper; never assume captions exist.
   `youtube-transcript-api` (1.x instance API) first, `yt-dlp --write-auto-subs` next,
@@ -84,7 +81,7 @@ color logic, schema, build plan). Render engine + aesthetic decisions are locked
 
 ## Status
 
-- ✅ Research + brand foundations (`research/`, `assets/brand/`)
+- ✅ Research + pluggable design system (`research/`, `design/`)
 - ✅ `DESIGN.md` — concrete design, knobs resolved
 - ✅ **Phase 1 — render (the `grid` layout)**: `scripts/render.mjs` turns a `layout.json` into a
   hand-drawn, on-brand PNG + SVG via rough.js + Playwright. Try it:
