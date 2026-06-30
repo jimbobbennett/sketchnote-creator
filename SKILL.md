@@ -1,11 +1,12 @@
 ---
 name: youtube-to-sketchnote
-description: Turn a YouTube video into a hand-drawn, on-brand Arize sketchnote (4K PNG + SVG). Pulls the transcript + metadata, uses Gemini to watch the actual video (slides, on-screen product names, speakers), has Claude author a structured layout, generates sketch portraits of the speakers and hand-drawn versions of key slides, renders a borderless 4×3 grid with rough.js, and fact-checks the result against the video with Codex + Gemini. Use when someone wants a sketchnote, visual summary, or one-page recap of a YouTube talk/video.
+description: Turn a YouTube video into a hand-drawn, on-brand sketchnote (4K PNG + SVG), styled by a pluggable design system. Pulls the transcript + metadata, uses Gemini to watch the actual video (slides, on-screen product names, speakers), has Claude author a structured layout, generates sketch portraits of the speakers and hand-drawn versions of key slides, renders a borderless 4×3 grid with rough.js, and fact-checks the result against the video with Codex + Gemini. Use when someone wants a sketchnote, visual summary, or one-page recap of a YouTube talk/video.
 ---
 
 # YouTube → Sketchnote
 
-Turn a YouTube talk into a single hand-drawn, Arize-branded sketchnote. The pipeline is:
+Turn a YouTube talk into a single hand-drawn sketchnote, styled by a pluggable design system
+(a brand-agnostic `design/default` ships in the repo). The pipeline is:
 
 ```
 extract.py ─► Gemini video-notes ─► Claude authors layout.json ─► speaker-sketch.py

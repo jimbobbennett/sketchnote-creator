@@ -5,7 +5,7 @@
   "required": ["title", "layout", "sections"],
   "additionalProperties": false,
   "properties": {
-    "title": { "type": "string", "maxLength": 60, "description": "Sentence case, Arize voice, no emoji" },
+    "title": { "type": "string", "maxLength": 60, "description": "Sentence case, the design system's voice, no emoji" },
     "subtitle": { "type": "string", "maxLength": 80 },
     "source": {
       "type": "object",

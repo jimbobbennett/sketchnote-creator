@@ -1,5 +1,11 @@
 # YouTube → Sketchnote skill — design
 
+> **Note:** this is the original design rationale, written when the tool was Arize-first. The look is
+> now driven by a **pluggable design system** (see `design/README.md`); the Arize palette/logos are a
+> local, gitignored drop-in (`design/arize/`) and are **not** part of this repo. References below to
+> `assets/brand/` and Arize-specific colours/voice are historical — the generic defaults live in
+> `design/default/`.
+
 Concrete design rolling up the four research docs:
 - `research/youtube-extraction.md` — how to get transcript / metadata / visuals
 - `research/sketchnotes-best-practices.md` — the genre's rules + programmatic-generation guidance

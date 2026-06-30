@@ -1,7 +1,7 @@
 /* Procedural hand-drawn marginalia + container shapes, drawn with rough.js.
    Runs in the page; exposes window.Doodles. All functions append SVG nodes to a
    target <svg> whose coordinate space matches where you want to draw. Colors come
-   from the caller (Arize palette). Everything is deterministic given the caller's seed. */
+   from the caller (the design system's palette). Everything is deterministic given the caller's seed. */
 (function () {
   const R = () => window.rough;
 

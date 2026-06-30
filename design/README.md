@@ -50,7 +50,9 @@ The `hues` keys (`teal/indigo/purple/magenta`) are just four colour **slots** �
 ## From a Claude Design system (claude.ai/design)
 
 If your brand already has a design system on **[claude.ai/design](https://claude.ai/design)**, you can
-pull it in with Claude Code — that's exactly how the bundled Arize one was made.
+pull it in with Claude Code and map it into a **local** `design/<name>/`. Anything you add under
+`design/` (other than `default/`) is gitignored, so your brand assets are **never committed** — they
+stay on your machine.
 
 1. In Claude Code (with the claude.ai login that owns/can access the design project), ask Claude to
    set it up — e.g. *"pull my claude.ai design system and add it as a sketchnote design system called
