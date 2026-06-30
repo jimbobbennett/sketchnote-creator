@@ -220,6 +220,7 @@ def main():
         "transcript_source": src,
         "onscreen": onscreen,
     }
+    Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     Path(a.out).write_text(json.dumps(context, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"✓ wrote {a.out}")
     if not a.keep_workdir:

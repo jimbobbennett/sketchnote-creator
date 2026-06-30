@@ -1,133 +1,102 @@
-# YouTube → Sketchnote skill
+# sketchnote-creator
 
-Turn a YouTube video into an engaging, on-brand (Arize) hand-drawn sketchnote — a single 4K image
-that distils a talk into a colour-coded grid with speaker portraits, redrawn key slides, and
-fact-checking against the source video.
+Turn a YouTube talk into a single, hand-drawn **sketchnote** — a 4K (3840×2160) image that distils the
+video into a colour-coded grid of sections, with sketch portraits of the speakers, redrawn key slides,
+and a quick fact-check against the source video. The look is driven by a **pluggable design system**, so
+it works for any brand (a generic one ships in the repo).
 
-## Quick start
+See [`examples/`](examples/) for finished output.
 
-The skill is **`SKILL.md`** — it orchestrates the pipeline end to end. In short:
+## How it works
+
+It's built to run as a **[Claude Code](https://claude.com/claude-code) skill** ([`SKILL.md`](SKILL.md)):
+Claude orchestrates a set of scripts and does the editorial work (writing the layout) in the middle.
+
+```
+extract.py ─► Gemini video-notes ─► author layout.json ─► speaker-sketch.py
+ (transcript)   (watches the video)      (the editorial step)    (portraits)
+                                                                      │
+ out/<slug>.png ◄── render.mjs ◄── slide-sketch.py ◄─────────────────┘
+ (4K PNG + SVG)     (rough.js)      (redraws key slides)
+       │
+       └─► validate-video.py (Gemini) + validate.mjs (Codex) ─► fix layout.json ─► re-render
+```
+
+- **extract** — transcript + metadata (captions → subtitles → Whisper fallback).
+- **video-notes** — Gemini watches the actual video for structure, on-screen product names, diagrams, speakers.
+- **layout.json** — the section-by-section plan (done by Claude per `SKILL.md`, or hand-authored).
+- **speaker-sketch / slide-sketch** — Gemini 2.5 Flash Image draws speaker portraits and redraws simple slides.
+- **render** — `rough.js` + headless Chromium (Playwright) produce the 4K hand-drawn grid (PNG + SVG).
+- **validate** — Gemini (watches the video) and optionally Codex fact-check the result; fix and re-render.
+
+## Prerequisites
+
+- **Command-line tools:** [`yt-dlp`](https://github.com/yt-dlp/yt-dlp), [`ffmpeg`](https://ffmpeg.org), **Node 18+**, **Python 3**.
+- **`GEMINI_API_KEY`** in the environment — Gemini reads the video and draws the portraits/slide sketches and validates. Without it, you can still render from a hand-written transcript + layout, but you lose the video reading, portraits, slide sketches, and the video validator.
+- **Optional:** [`codex`](https://github.com/openai/codex) CLI (a second, transcript-based validator); `whisper.cpp` (`whisper-cli`) or `openai-whisper` for videos with no captions; `tesseract` only if you use `extract.py --with-frames`.
+
+## Setup
 
 ```bash
-cd scripts && npm install && pip install -r requirements.txt   # one-time
-# then, per video (see SKILL.md for the full flow):
+git clone https://github.com/jimbobbennett/sketchnote-creator.git
+cd sketchnote-creator
+
+# Node deps + headless Chromium
+(cd scripts && npm install && npx playwright install chromium)
+
+# Python deps
+pip install -r scripts/requirements.txt
+
+# Gemini key (get one at https://aistudio.google.com/apikey)
+export GEMINI_API_KEY=...
+```
+
+## Usage
+
+### As a Claude Code skill (recommended)
+Open this repo in Claude Code and ask it to sketchnote a video, e.g.
+*"make a sketchnote of https://youtu.be/…"*. Claude follows [`SKILL.md`](SKILL.md): it runs the
+scripts, writes the layout, renders, validates, and shows you the result.
+
+### Manually
+Pick a short `<slug>` for the video, then:
+
+```bash
 python3 scripts/extract.py "<youtube-url>" --out work/<slug>/context.json
-python3 scripts/video-notes.py --context work/<slug>/context.json
-#  …Claude authors work/<slug>/layout.json…
+python3 scripts/video-notes.py   --context work/<slug>/context.json
+# author work/<slug>/layout.json  (see scripts/layout.schema.json + scripts/sample-grid.layout.json)
 python3 scripts/speaker-sketch.py --context work/<slug>/context.json --out-dir assets/<slug>-speakers
 python3 scripts/slide-sketch.py   --context work/<slug>/context.json --layout work/<slug>/layout.json --out-dir assets/<slug>-slides
-node scripts/render.mjs work/<slug>/layout.json --out out/<slug>
+node    scripts/render.mjs        work/<slug>/layout.json --out out/<slug>
 python3 scripts/validate-video.py --image out/<slug>.png --context work/<slug>/context.json
 ```
 
-Needs `GEMINI_API_KEY` (video reading, portraits, slide sketches, validation) and, optionally,
-`codex` for a second validator. See **`SKILL.md`** for prerequisites and authoring rules,
-**`DESIGN.md`** for the rationale, and **`examples/`** for finished output.
+The middle step — `layout.json` — is the creative one (title, sections, bullets, quotes, icons). It's
+what the skill writes for you; to do it by hand, follow the schema (`scripts/layout.schema.json`) and the
+worked sample (`scripts/sample-grid.layout.json`).
 
-## Layout
+**`render.mjs` flags:** `--design design/<name>` (palette/fonts/logo; default `design/default`),
+`--light` (default theme is dark), `--decor none|light|medium|heavy` (default `light`),
+`--seed N`, `--scale N` (default 2 → 4K), `--no-svg`. Pass the same `--design` to `slide-sketch.py`.
+
+Output: `out/<slug>.png` (4K 16:9) + `out/<slug>.svg`, self-contained (portraits/slides embedded).
+
+## Design system
+
+Palette, fonts, logo, and voice come from `design/<name>/design.json`. `design/default/` ships in the
+repo and is used unless you pass `--design`. To brand it for yourself, copy `design/default/` to
+`design/<name>/`, edit the JSON, and pass `--design design/<name>`. Anything you add under `design/`
+(other than `default/`) stays local and untracked. Full format + walkthrough in
+[`design/README.md`](design/README.md).
+
+## Project layout
 
 ```
-SKILL.md                          # the skill — orchestrates the whole pipeline
-scripts/                          # extract / video-notes / speaker-sketch / slide-sketch / render / validate
-templates/                        # sketchnote.css + draw.js + doodles.js (brand-agnostic)
-design/
-  default/                        # generic, committed design system (palette, fonts, pencil logo)
-  README.md                       # how design systems work + how to add your own
-  <yourbrand>/                    # local, gitignored — drop your palette/logo/voice here
-research/
-  sketchnotes-best-practices.md   # how sketchnotes work + rules for programmatic generation
-  youtube-extraction.md           # how to pull transcript / metadata / visuals from a video
-examples/                         # finished sample sketchnotes
+SKILL.md         the skill — orchestrates the whole pipeline
+scripts/         extract · video-notes · speaker-sketch · slide-sketch · render · validate · validate-video
+templates/       sketchnote.css + draw.js + doodles.js  (brand-agnostic; design tokens injected at render)
+design/          default/ (generic, committed) + README.md (how to add your own brand)
+research/        background notes on sketchnoting + video extraction
+examples/        finished sample sketchnotes
+DESIGN.md        design rationale and decisions
 ```
-
-## Design system (pluggable)
-The look is **not** hard-wired to any brand — palette, fonts, logo, and voice come from a design
-system under `design/<name>/design.json`. `design/default/` ships in the repo; drop your own brand in
-`design/<name>/` (stays local) and pass `--design design/<name>`. See **`design/README.md`**.
-
-## Research summary
-
-### 1. Sketchnote best practices → `research/sketchnotes-best-practices.md`
-Synthesized from Mike Rohde, Doug Neill (Verbal to Visual), Eva-Lotta Lamm, Sunni Brown, et al.
-Most relevant for programmatic generation:
-- **Layout decision rule:** map detected talk structure → layout (linear is the safe default;
-  YouTube chapters → modular/grid; single center → radial). Axes: *is there ordering?* and
-  *is there a single center?*
-- **Multi-pass pipeline** mirrors the human discipline: Structure → Salience → Vocabulary →
-  Layout/allocation → Render. Read the *whole* transcript before placing anything (don't go chunk-by-chunk).
-- **Hard rules:** one title + 3–7 key-idea clusters + sparse details; typography *is* the
-  hierarchy (4 levels, 2–3 type styles); palette = ink + grey + **one** accent; bias to omission.
-- **Visual vocabulary:** containers (box/cloud/banner), connectors (arrows), bullets/frames/dividers,
-  icons, star/stick people, emphasis. Convention→meaning defaults: banner→title, cloud→soft idea,
-  box→fact, thick arrow→trend, looping arrow→cycle.
-- Two brief corrections from the agent: Rohde's primitives are the **five basic shapes** (square,
-  circle, triangle, line, dot), not a "Five S's"; and his seventh layout is **skyscraper**, not "skeleton."
-
-### 2. YouTube extraction → `research/youtube-extraction.md`
-Tooling and an end-to-end pipeline. Headlines:
-- **Cascade** captions → subtitles → Whisper; never assume captions exist.
-  `youtube-transcript-api` (1.x instance API) first, `yt-dlp --write-auto-subs` next,
-  `whisper-cli` (whisper.cpp, Metal-accelerated on this Mac) as fallback.
-- **Metadata via yt-dlp** (not the Data API) — only yt-dlp exposes **chapters**, the best
-  segment boundaries for sketchnote sections.
-- **Visuals:** `yt-dlp` (720p) + `ffmpeg` scene-detect keyframes + `tesseract` OCR to keep
-  slide/diagram frames and pull on-screen text.
-- Keep **timestamps everywhere** so transcript + chapters + OCR'd text align for the LLM.
-- Required tools (`yt-dlp`, `ffmpeg`, `tesseract`, `whisper-cli`, `python3`) are **already installed** locally.
-
-## Design
-See **`DESIGN.md`** for the full skill design (4-stage pipeline, layout selector, cell template,
-color logic, schema, build plan). Render engine + aesthetic decisions are locked there.
-
-## Status
-
-- ✅ Research + pluggable design system (`research/`, `design/`)
-- ✅ `DESIGN.md` — concrete design, knobs resolved
-- ✅ **Phase 1 — render (the `grid` layout)**: `scripts/render.mjs` turns a `layout.json` into a
-  hand-drawn, on-brand PNG + SVG via rough.js + Playwright. Try it:
-  ```bash
-  cd scripts && npm install
-  node render.mjs sample-grid.layout.json --out ../out/sample-grid
-  ```
-  Output + a worked example live in `out/`. Schema: `scripts/layout.schema.json`.
-- ✅ **Phase 2 — `extract.py`** (transcript/metadata/chapters/visuals → `context.json`).
-  Cascade: youtube-transcript-api → yt-dlp srv1 → whisper.cpp. Visuals opt-in via `--with-frames`.
-  ```bash
-  python3 scripts/extract.py "https://youtu.be/errTnC59gVM" --out work/context.json
-  ```
-- ✅ **End-to-end proven on a real video** — the Arize Observe 2026 keynote flowed
-  extract → structure → render. Worked example: `work/keynote.layout.json` → `out/keynote.png`.
-- ✅ **Validator (`scripts/validate.mjs`)** — independent Codex pass that checks the rendered PNG
-  back against the video transcript with **no shared context**, emitting `findings.json`
-  (`verdict` + issues). Forms a validate → fix → re-render cycle.
-  ```bash
-  node scripts/validate.mjs --image out/keynote.png --context work/context.json
-  ```
-- ✅ **Video-grounded validator (`scripts/validate-video.py`)** — Gemini watches the actual
-  YouTube video (audio + slides) + the PNG and validates fidelity; reads on-screen text as the
-  authoritative source for product names. Same `findings.json` shape. Needs `GEMINI_API_KEY`.
-  ```bash
-  python3 scripts/validate-video.py --image out/keynote.png --context work/context.json
-  ```
-- ✅ **Visual richness — Phase A** (see `VISUALS-PLAN.md`): procedural rough.js marginalia
-  (sparkles/stars/doodles, seeded, placed only in free zones), container variety (box / **cloud** /
-  **speech-bubble** — quotes now render as bubbles), and emphasis. New flags: `--dark`/`--light`
-  (**default dark**), `--decor none|light|medium|heavy` (**default light**), `--seed N`; layout fields
-  `decor`, `section.container`, `section.emphasis`.
-- ✅ **Visual richness — Phase B** (`scripts/speaker-sketch.py`): Gemini vision finds the speakers in
-  the video thumbnail → PIL crops the headshots → Gemini 2.5 Flash Image redraws each as a pink
-  line-art portrait (bg keyed to transparent, auto-cropped) → composited top-right with name + role.
-  Portraits cached in `assets/speakers/`; `layout.speakers` references them.
-  ```bash
-  python3 scripts/speaker-sketch.py --context work/context.json
-  ```
-- ✅ **Slide sketches (`scripts/slide-sketch.py`)**: Gemini selects sections with a simple useful
-  on-screen visual, ffmpeg grabs the frame, Gemini 2.5 Flash Image redraws it as a small line sketch
-  recolored to the section hue, patched into `section.figure`. (Prompted to skip dense flowcharts.)
-- ✅ **Layout — borderless grid** (the keeper; popcorn/path/radial/conversation were tried and dropped).
-  Sections are borderless clusters (hue banner + section image + bullets + optional quote bubble) on a
-  4×3 grid. Output is fixed **16:9, 3840×2160 (4K)** at the default 2× scale (`--scale` adjusts).
-  Section images (slide sketches) render large as the focal visual.
-- ⬜ Remaining layouts (popcorn / path / radial / conversation)
-- ⬜ Phase 3 — write the stage-2 structuring rules into `SKILL.md` so the skill is self-driving
-- ⬜ Phase 4 — polish (icon library, dark variant, density balancing, footer-left fix, review loop)

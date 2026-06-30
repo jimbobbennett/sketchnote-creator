@@ -2,7 +2,7 @@
 /* Render a sketchnote layout.json -> PNG (+ SVG) using rough.js + Playwright.
    Usage: node render.mjs <layout.json> [--out <basename>] [--no-svg] [--scale N] [--keep-html]
    Phase 1: implements the `grid` layout. Other layouts fall back to grid for now. */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve, basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
@@ -176,6 +176,7 @@ window.__MOTIFS=${JSON.stringify(motifSvgs)};</script>
 <script>${drawJs}</script>
 </body></html>`;
 
+mkdirSync(dirname(outBase), { recursive: true });
 if (keepHtml) writeFileSync(outBase + '.html', html);
 
 // ---------- render ----------
