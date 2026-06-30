@@ -42,25 +42,27 @@ extract.py ─► Gemini video-notes ─► author layout.json ─► speaker-sk
 
 ## Prerequisites
 
-- **Command-line tools:** [`yt-dlp`](https://github.com/yt-dlp/yt-dlp), [`ffmpeg`](https://ffmpeg.org), **Node 18+**, **Python 3**.
-- **`GEMINI_API_KEY`** in the environment — Gemini reads the video and draws the portraits/slide sketches and validates. Without it, you can still render from a hand-written transcript + layout, but you lose the video reading, portraits, slide sketches, and the video validator.
-- **Optional:** [`codex`](https://github.com/openai/codex) CLI (a second, transcript-based validator); `whisper.cpp` (`whisper-cli`) or `openai-whisper` for videos with no captions; `tesseract` only if you use `extract.py --with-frames`.
+You provide these yourself (the setup step installs the rest):
+
+- **[`ffmpeg`](https://ffmpeg.org)** — the one system binary the installer can't fetch (macOS: `brew install ffmpeg`, Debian/Ubuntu: `sudo apt install ffmpeg`, Windows: `winget install ffmpeg`).
+- **Node 18+** and **Python 3**.
+- **`GEMINI_API_KEY`** in the environment — Gemini reads the video and draws the portraits/slide sketches and validates. Without it you can still render from a hand-written transcript + layout, but you lose the video reading, portraits, slide sketches, and the video validator.
+- **Optional:** [`codex`](https://github.com/openai/codex) CLI (a second, transcript-based validator); `whisper.cpp` (`whisper-cli`) or `openai-whisper` for videos with no captions; `tesseract` only for `extract.py --with-frames`.
+
+`yt-dlp` is installed for you via pip (it's in `requirements.txt`).
 
 ## Setup
 
 ```bash
 git clone https://github.com/jimbobbennett/sketchnote-creator.git
 cd sketchnote-creator
-
-# Node deps + headless Chromium
-(cd scripts && npm install && npx playwright install chromium)
-
-# Python deps
-pip install -r scripts/requirements.txt
-
-# Gemini key (get one at https://aistudio.google.com/apikey)
-export GEMINI_API_KEY=...
+./scripts/setup.sh            # npm + pip deps, headless Chromium, then checks system tools
+export GEMINI_API_KEY=...     # https://aistudio.google.com/apikey
 ```
+
+`setup.sh` installs the Node and Python packages and the headless browser, then reports whether
+`ffmpeg`/`node`/`python3`/`GEMINI_API_KEY` are present (it does **not** install system packages or use
+sudo). Or run the steps yourself: `(cd scripts && npm install && npx playwright install chromium) && pip install -r scripts/requirements.txt`.
 
 ## Usage
 
@@ -97,7 +99,8 @@ Output: `out/<slug>.png` (4K 16:9) + `out/<slug>.svg`, self-contained (portraits
 Palette, fonts, logo, and voice come from `design/<name>/design.json`. `design/default/` ships in the
 repo and is used unless you pass `--design`. To brand it for yourself, copy `design/default/` to
 `design/<name>/`, edit the JSON, and pass `--design design/<name>`. Anything you add under `design/`
-(other than `default/`) stays local and untracked. Full format + walkthrough in
+(other than `default/`) stays local and untracked. Full format + walkthrough — including **pulling a
+design system from [claude.ai/design](https://claude.ai/design)** via Claude Code — in
 [`design/README.md`](design/README.md).
 
 ## Project layout

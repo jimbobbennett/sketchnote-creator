@@ -46,3 +46,28 @@ works for anyone, not just Arize. A design system is a folder under `design/<nam
 
 The `hues` keys (`teal/indigo/purple/magenta`) are just four colour **slots** — a section's `hue` in
 `layout.json` refers to a slot, so any palette works without changing layouts.
+
+## From a Claude Design system (claude.ai/design)
+
+If your brand already has a design system on **[claude.ai/design](https://claude.ai/design)**, you can
+pull it in with Claude Code — that's exactly how the bundled Arize one was made.
+
+1. In Claude Code (with the claude.ai login that owns/can access the design project), ask Claude to
+   set it up — e.g. *"pull my claude.ai design system and add it as a sketchnote design system called
+   `mybrand`"*. Claude uses the **`/design-sync`** skill / DesignSync tool to list your design-system
+   projects and read their files. The first run may prompt you to grant design-system access to your
+   claude.ai login.
+2. Claude reads the project's colour + type tokens (e.g. a `colors_and_type.css`) and logo SVGs and
+   writes `design/mybrand/design.json` + the logo files for you, mapping:
+   - **accent** ← your primary brand/accent colour (used sparingly: quote bubbles, checks, emphasis, portrait circles)
+   - **hues** (the 4 slots) ← your functional/secondary colours used for grouping
+   - **dark / light** ← your dark + light surface (`canvas`) and text (`ink`/`ink2`) colours
+   - **logo.dark / logo.light** ← the brand logo SVGs (prefer `currentColor` versions so they adapt)
+   - **voice** ← your brand's tone/voice notes
+3. **Fonts:** the sketchnote look uses hand-drawn web fonts (Permanent Marker / Shantell Sans) on
+   purpose — keep those unless your brand has a display/hand font you'd rather use. The brand comes
+   through in the **colours, logo, and voice**, not the body typeface.
+4. Render with `--design design/mybrand` (same flag to `slide-sketch.py`). The folder stays local
+   (gitignored), so your brand assets never get committed.
+
+No claude.ai design system? Just hand-write `design.json` per *Make your own* above.

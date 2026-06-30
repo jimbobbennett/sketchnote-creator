@@ -21,14 +21,12 @@ Claude does the **authoring + adjudication**; the scripts do extraction, image g
 
 ## Prerequisites
 
-- **CLIs:** `yt-dlp`, `ffmpeg`, `node` (18+), `python3`. `codex` (optional, for the second validator) with `codex login`.
+- **Install once:** `./scripts/setup.sh` — installs npm + pip deps and headless Chromium, then checks
+  system tools. (Manual: `(cd scripts && npm install && npx playwright install chromium) && pip install -r scripts/requirements.txt`.)
+- **System tools (install yourself; setup.sh only checks):** `ffmpeg`, `node` 18+, `python3`. `yt-dlp`
+  is pip-installed via `requirements.txt`. Optional: `codex` (2nd validator, `codex login`),
+  `whisper.cpp`/`openai-whisper` (no-caption ASR), `tesseract` (`--with-frames`).
 - **Keys:** `GEMINI_API_KEY` in the environment (Gemini reads the video, draws portraits/slides, validates). Without it the skill still works from the transcript alone, minus video-grounded notes, portraits, and slide sketches.
-- **Install once:**
-  ```bash
-  cd scripts && npm install            # playwright, roughjs, handlebars, lucide-static
-  pip install -r scripts/requirements.txt
-  npx playwright install chromium      # if Chromium isn't already cached
-  ```
 
 ## Design system
 
