@@ -5,7 +5,18 @@ video into a colour-coded grid of sections, with sketch portraits of the speaker
 and a quick fact-check against the source video. The look is driven by a **pluggable design system**, so
 it works for any brand (a generic one ships in the repo).
 
-See [`examples/`](examples/) for finished output.
+## Examples
+
+*The Future of AI Agents* — Arize Observe 2026 keynote ([watch](https://youtu.be/errTnC59gVM)):
+
+![Sketchnote of the Arize Observe 2026 keynote, The Future of AI Agents](examples/keynote-arize-observe-2026.png)
+
+*Harnessing User Feedback at ChatGPT Scale* — OpenAI, Stuart Sy ([watch](https://youtu.be/c1xPkDi-038)):
+
+![Sketchnote of the OpenAI talk, Harnessing User Feedback at ChatGPT Scale](examples/openai-feedback-chatgpt-scale.png)
+
+Both were generated end-to-end and rendered with the (local) Arize design system; run without `--design`
+for the generic look. More in [`examples/`](examples/).
 
 ## How it works
 
