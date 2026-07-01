@@ -23,9 +23,11 @@ I_MODEL = os.environ.get("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image")
 
 DETECT = """This is a YouTube thumbnail for a talk. Identify the MAIN SPEAKERS pictured — real people
 shown as headshot photos, usually captioned with their name and title. For each, return their name,
-a concise role/title (e.g. "Founder · CEO"), and the bounding box of their head/face photo.
-Return ONLY JSON: {"speakers":[{"name":"","role":"","box_2d":[ymin,xmin,ymax,xmax]}]}
-box_2d is normalized to 0-1000 as [ymin, xmin, ymax, xmax]. Exclude logos and non-people. """
+a concise role/title (e.g. "Founder · CEO"), the company/org they represent (e.g. "Anthropic"), and
+the bounding box of their head/face photo.
+Return ONLY JSON: {"speakers":[{"name":"","role":"","company":"","box_2d":[ymin,xmin,ymax,xmax]}]}
+box_2d is normalized to 0-1000 as [ymin, xmin, ymax, xmax]. Keep role and company separate (don't repeat
+the company in the role). Exclude logos and non-people; exclude an interviewer/host if a guest is the subject."""
 
 SKETCH = """Redraw the person in this photo as a hand-drawn SKETCHNOTE portrait.
 Show ONLY the head and shoulders — omit hands, cups, drinks, logos, jewellery, and any background
@@ -122,7 +124,7 @@ def main():
     # --- 2 + 3. crop + stylize each ---
     manifest = []
     for s in speakers:
-        name, role = s.get("name", "Speaker"), s.get("role", "")
+        name, role, comp = s.get("name", "Speaker"), s.get("role", ""), s.get("company", "")
         box = s.get("box_2d") or [0, 0, 1000, 1000]
         ymin, xmin, ymax, xmax = box
         # normalized 0-1000 → pixels, with ~12% padding
@@ -149,7 +151,7 @@ def main():
             continue
         portrait = out_dir / f"{slug(name)}.png"
         keyout_bg(Image.open(io.BytesIO(png))).save(portrait)
-        manifest.append({"name": name, "role": role, "portrait": str(portrait)})
+        manifest.append({"name": name, "role": role, "company": comp, "portrait": str(portrait)})
         if not a.quiet:
             print(f"  ✓ {portrait}", file=sys.stderr)
 

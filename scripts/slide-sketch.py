@@ -36,11 +36,19 @@ def run(cmd):
     return subprocess.run(cmd, capture_output=True, text=True)
 
 
+def _loads(s):
+    """json.loads, tolerating LLM quirks like trailing commas before } or ]."""
+    try:
+        return json.loads(s)
+    except Exception:
+        return json.loads(re.sub(r",(\s*[}\]])", r"\1", s))
+
+
 def first_json(txt):
-    """Parse the first balanced JSON object from a model response (tolerates trailing data)."""
+    """Parse the first balanced JSON object from a model response (tolerates trailing data + commas)."""
     txt = (txt or "").strip()
     try:
-        return json.loads(txt)
+        return _loads(txt)
     except Exception:
         pass
     start = txt.find("{")
@@ -53,7 +61,7 @@ def first_json(txt):
         elif txt[i] == "}":
             depth -= 1
             if depth == 0:
-                return json.loads(txt[start:i + 1])
+                return _loads(txt[start:i + 1])
     raise ValueError("unbalanced JSON in response")
 
 

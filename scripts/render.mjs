@@ -135,7 +135,7 @@ const speakersHtml = (layout.speakers && layout.speakers.length)
       try { src = 'data:image/png;base64,' + readFileSync(resolve(ROOT, sp.portrait)).toString('base64'); }
       catch { warn('portrait not found: ' + sp.portrait); }
       return `<div class="speaker">${src ? `<span class="portrait-wrap"><img class="portrait" src="${src}"/></span>` : ''}
-        <div class="sp-name">${esc(sp.name)}</div><div class="sp-role">${esc(sp.role || '')}</div></div>`;
+        <div class="sp-name">${esc(sp.name)}</div>${sp.role ? `<div class="sp-role">${esc(sp.role)}</div>` : ''}${sp.company ? `<div class="sp-company">${esc(sp.company)}</div>` : ''}</div>`;
     }).join('') + `</div>`
   : '';
 const topbarHtml = `<div class="topbar">

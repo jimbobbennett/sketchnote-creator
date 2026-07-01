@@ -18,3 +18,7 @@ design/*
 !design/README.md
 
 # Committed sample outputs live in examples/ (not ignored)
+
+# Brand-specific batch content (social copy + posting scripts) stays local.
+linkedin-*.md
+scripts/post-*.py

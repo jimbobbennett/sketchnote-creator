@@ -43,8 +43,9 @@
 .speaker { display: flex; flex-direction: column; align-items: center; width: 104px; text-align: center; gap: 5px; }
 .portrait-wrap { width: 88px; height: 88px; border-radius: 50%; background: var(--pink); overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px var(--canvas), 0 0 0 3.5px var(--pink); }
 .portrait { width: 100%; height: 100%; object-fit: cover; }
-.sp-name { font-family: var(--font-hand); font-weight: 700; font-size: 14px; line-height: 1.05; color: var(--ink); }
-.sp-role { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2px; color: var(--ink-2); }
+.sp-name { font-family: var(--font-hand); font-weight: 700; font-size: 14px; line-height: 1.1; color: var(--ink); }
+.sp-role { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2px; color: var(--ink-2); line-height: 1.2; }
+.sp-company { font-family: var(--font-hand); font-weight: 700; font-size: 12px; line-height: 1.15; color: var(--pink); margin-top: 1px; }
 .brand-mark { width: 54px; height: 54px; flex: none; color: var(--pink); }
 .brand-mark svg { width: 100%; height: 100%; }
 

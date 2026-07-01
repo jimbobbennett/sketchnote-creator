@@ -91,6 +91,7 @@
         "properties": {
           "name": { "type": "string" },
           "role": { "type": "string" },
+          "company": { "type": "string", "description": "the speaker's org/company (shown under the portrait)" },
           "portrait": { "type": "string", "description": "path to the portrait PNG (relative to repo root)" }
         }
       }
